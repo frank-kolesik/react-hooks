@@ -2,6 +2,7 @@
   "name": "react-hooks",
   "version": "1.0.0",
   "description": "Basic React Hooks",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -9,14 +10,19 @@
   ],
   "scripts": {
     "dev": "rimraf dist && tsc --watch",
-    "build": "rimraf dist && tsc"
+    "build": "rimraf dist && tsc",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "Frank Kolesik <frank.kolesik@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@testing-library/react": "^14.1.2",
     "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "jsdom": "^23.0.1",
     "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "vitest": "^1.1.0"
