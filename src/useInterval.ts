@@ -10,14 +10,16 @@ export const useInterval = ({
   active: boolean;
 }) => {
   const callbackRef = React.useRef<() => void>();
-  const intervalRef = React.useRef<number | undefined>();
+  const intervalRef = React.useRef<NodeJS.Timeout | undefined>();
 
   React.useEffect(() => {
     callbackRef.current = callback;
   });
 
   React.useEffect(() => {
-    if (!active) return () => clearInterval(intervalRef.current);
+    if (!active) {
+      return () => clearInterval(intervalRef.current);
+    }
 
     intervalRef.current = setInterval(() => {
       callbackRef.current && callbackRef.current();
