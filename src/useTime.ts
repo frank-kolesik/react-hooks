@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useInterval } from './useInterval';
 
-import { getCurrentTime } from './utils';
+import { getCurrentTime } from './time';
 
 export const useTime = () => {
   const [time, setTime] = React.useState(getCurrentTime());

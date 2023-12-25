@@ -1,4 +1,6 @@
-export const getCurrentTime = () => {
+import { TimeInput, TimeOutput } from './types';
+
+export const getCurrentTime = (): TimeOutput => {
   const now = new Date();
 
   const timestampInMilliseconds = now.getTime();
@@ -12,25 +14,17 @@ export const getCurrentTime = () => {
   return getTimeFromSeconds(currentTimestamp);
 };
 
-export const getTimeFromSeconds = (s: number) => {
-  const days = Math.floor(s / (60 * 60 * 24));
+export const getTimeFromSeconds = (s: number): TimeOutput => {
   const hours = Math.floor((s % (60 * 60 * 24)) / (60 * 60));
   const minutes = Math.floor((s % (60 * 60)) / 60);
   const seconds = Math.floor(s % 60);
-
-  return { seconds, minutes, hours, days };
+  return { seconds, minutes, hours };
 };
 
-export const getSecondsFromTime = (time: {
-  seconds?: number;
-  minutes?: number;
-  hours?: number;
-  days?: number;
-}) => {
+export const getSecondsFromTime = (time: TimeInput): number => {
   return (
     (time.seconds ?? 0) * 1 +
     (time.minutes ?? 0) * 60 +
-    (time.hours ?? 0) * 60 * 60 +
-    (time.days ?? 0) * 60 * 60 * 24
+    (time.hours ?? 0) * 60 * 60
   );
 };

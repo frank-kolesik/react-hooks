@@ -1,30 +1,21 @@
 import * as React from 'react';
 
-export const useInterval = ({
-  callback,
-  interval,
-  active,
-}: {
-  callback: () => void;
-  interval: number;
-  active: boolean;
-}) => {
+import { IntervalOptions } from './types';
+
+export const useInterval = (options: IntervalOptions) => {
   const callbackRef = React.useRef<() => void>();
-  const intervalRef = React.useRef<NodeJS.Timeout | undefined>();
 
   React.useEffect(() => {
-    callbackRef.current = callback;
+    callbackRef.current = options.callback;
   });
 
   React.useEffect(() => {
-    if (!active) {
-      return () => clearInterval(intervalRef.current);
-    }
+    if (!options.active) return () => {};
 
-    intervalRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       callbackRef.current && callbackRef.current();
-    }, interval);
+    }, options.interval);
 
-    return () => clearInterval(intervalRef.current);
-  }, [active, interval]);
+    return () => clearInterval(interval);
+  }, [options.active, options.interval]);
 };

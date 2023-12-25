@@ -1,18 +1,44 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { renderHook } from '@testing-library/react';
 
 import { useInterval } from './useInterval';
 
-type UseIntervalParams = Partial<Parameters<typeof useInterval>[0]>;
-
-describe('useInterval', () => {
+beforeEach(() => {
   vi.useFakeTimers();
+});
 
-  it('tests the active state', () => {
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+it('checks the number of running timers', () => {
+  const hook = renderHook((active: boolean = true) =>
+    useInterval({
+      callback: () => {},
+      interval: 100,
+      active: active,
+    })
+  );
+
+  expect(vi.getTimerCount()).toBe(1);
+
+  hook.rerender(false);
+
+  expect(vi.getTimerCount()).toBe(0);
+
+  hook.rerender(true);
+
+  expect(vi.getTimerCount()).toBe(1);
+
+  hook.unmount();
+
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+describe('check that the callback is called', () => {
+  test('when the timer is active', () => {
     const callback = vi.fn();
-
-    expect(callback).toHaveBeenCalledTimes(0);
 
     renderHook(() =>
       useInterval({
@@ -27,10 +53,48 @@ describe('useInterval', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('tests the inactive state', () => {
+  test('when the timer changes from inactive to active', () => {
     const callback = vi.fn();
 
-    expect(callback).toHaveBeenCalledTimes(0);
+    const hook = renderHook((active: boolean = false) =>
+      useInterval({
+        callback: callback,
+        interval: 100,
+        active: active,
+      })
+    );
+
+    hook.rerender(true);
+
+    vi.runOnlyPendingTimers();
+
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    hook.unmount();
+  });
+
+  test('when the callback changes from one to another', () => {
+    const hook = renderHook((callback: () => void = vi.fn()) =>
+      useInterval({
+        callback: callback,
+        interval: 100,
+        active: true,
+      })
+    );
+
+    const callback = vi.fn();
+
+    hook.rerender(callback);
+
+    vi.runOnlyPendingTimers();
+
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('check that the callback is NOT called', () => {
+  test('when the timer is inactive', () => {
+    const callback = vi.fn();
 
     renderHook(() =>
       useInterval({
@@ -45,57 +109,23 @@ describe('useInterval', () => {
     expect(callback).toHaveBeenCalledTimes(0);
   });
 
-  it('tests the change from active to inactive state', () => {
+  test('when the timer changes from active to inactive', () => {
     const callback = vi.fn();
 
-    expect(callback).toHaveBeenCalledTimes(0);
-
-    const hook = renderHook((params: UseIntervalParams) =>
+    const hook = renderHook((active: boolean = true) =>
       useInterval({
         callback: callback,
         interval: 100,
-        active: params?.active ?? true,
+        active: active,
       })
     );
 
-    vi.runOnlyPendingTimers();
-
-    expect(callback).toHaveBeenCalledTimes(1);
-
-    hook.rerender({ active: false });
+    hook.rerender(false);
 
     vi.runOnlyPendingTimers();
 
-    expect(callback).toHaveBeenCalledTimes(1);
-  });
+    expect(callback).toHaveBeenCalledTimes(0);
 
-  it('tests the change from one callback to another', () => {
-    const callbackOne = vi.fn();
-
-    expect(callbackOne).toHaveBeenCalledTimes(0);
-
-    const hook = renderHook((params: UseIntervalParams) =>
-      useInterval({
-        callback: params?.callback ?? callbackOne,
-        interval: 100,
-        active: true,
-      })
-    );
-
-    vi.runOnlyPendingTimers();
-
-    expect(callbackOne).toHaveBeenCalledTimes(1);
-
-    const callbackTwo = vi.fn();
-
-    expect(callbackTwo).toHaveBeenCalledTimes(0);
-
-    hook.rerender({ callback: callbackTwo });
-
-    vi.runOnlyPendingTimers();
-
-    expect(callbackOne).toHaveBeenCalledTimes(1);
-
-    expect(callbackTwo).toHaveBeenCalledTimes(1);
+    hook.unmount();
   });
 });
