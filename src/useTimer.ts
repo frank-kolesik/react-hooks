@@ -4,7 +4,7 @@ import { useInterval } from './useInterval';
 
 import { getSecondsFromTime, getTimeFromSeconds } from './time';
 
-import { TimeOptions } from './types';
+import { TimerOptions } from './types';
 
 const enum Status {
   STARTED = 'STARTED',
@@ -12,7 +12,7 @@ const enum Status {
   COMPLETED = 'COMPLETED',
 }
 
-export const useTimer = (options: TimeOptions) => {
+export const useTimer = (options: TimerOptions) => {
   const initialSeconds = getSecondsFromTime(options.initialTime);
 
   const [status, setStatus] = React.useState(Status.STOPPED);
